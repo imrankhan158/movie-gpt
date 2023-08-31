@@ -1,6 +1,6 @@
-## steps
+## Steps
 
-- create react app
+- Create React App
 - configure tailwind
 
 ## Feature
@@ -9,7 +9,7 @@
 - Browse
   - Header
   - Main Movie
-  - Trailor in background
+  - Trailer in the background
   - Title & description
   - Movie Suggestions
   - Movie list x N
