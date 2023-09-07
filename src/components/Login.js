@@ -1,35 +1,66 @@
-import React, { useRef, useState } from "react";
+import { useState, useRef } from "react";
 import Header from "./Header";
-import { checkValidData } from "../utils/Validations";
+import { checkValidData } from "../utils/validate";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   updateProfile,
 } from "firebase/auth";
 import { auth } from "../utils/firebase";
-import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { addUser } from "../store/userSlice";
-import { LOGO } from "../utils/constants";
+import { USER_AVATAR } from "../utils/constants";
 
 const Login = () => {
   const [isSignInForm, setIsSignInForm] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const name = useRef(null);
   const email = useRef(null);
   const password = useRef(null);
-  const toggleSignInForm = () => {
-    setIsSignInForm(!isSignInForm);
-  };
+
   const handleButtonClick = () => {
     const message = checkValidData(email.current.value, password.current.value);
     setErrorMessage(message);
     if (message) return;
+
     if (!isSignInForm) {
+      // Sign Up Logic
       createUserWithEmailAndPassword(
+        auth,
+        email.current.value,
+        password.current.value
+      )
+        .then((userCredential) => {
+          const user = userCredential.user;
+          updateProfile(user, {
+            displayName: name.current.value,
+            photoURL: USER_AVATAR,
+          })
+            .then(() => {
+              const { uid, email, displayName, photoURL } = auth.currentUser;
+              dispatch(
+                addUser({
+                  uid: uid,
+                  email: email,
+                  displayName: displayName,
+                  photoURL: photoURL,
+                })
+              );
+            })
+            .catch((error) => {
+              setErrorMessage(error.message);
+            });
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setErrorMessage(errorCode + "-" + errorMessage);
+        });
+    } else {
+      // Sign In Logic
+      signInWithEmailAndPassword(
         auth,
         email.current.value,
         password.current.value
@@ -37,47 +68,30 @@ const Login = () => {
         .then((userCredential) => {
           // Signed in
           const user = userCredential.user;
-          updateProfile(user, {
-            displayName: name.current.value,
-          })
-            .then(() => {
-              const { uid, email, displayName } = auth.currentUser;
-              dispatch(addUser({ uid, email, displayName }));
-            })
-            .catch((error) => {
-              navigate("/error");
-            });
-          console.log(user);
         })
         .catch((error) => {
-          setErrorMessage(error.message);
-          console.log(error);
-        });
-    } else {
-      signInWithEmailAndPassword(
-        auth,
-        email.current.value,
-        password.current.value
-      )
-        .then((userCredential) => {
-          const user = userCredential.user;
-          console.log(user);
-        })
-        .catch((error) => {
-          setErrorMessage(error.message);
-          console.log(error);
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setErrorMessage(errorCode + "-" + errorMessage);
         });
     }
+  };
+
+  const toggleSignInForm = () => {
+    setIsSignInForm(!isSignInForm);
   };
   return (
     <div>
       <Header />
       <div className="absolute">
-        <img src={LOGO} alt="MovieGPT" />
+        <img
+          src="https://assets.nflxext.com/ffe/siteui/vlv3/fc164b4b-f085-44ee-bb7f-ec7df8539eff/d23a1608-7d90-4da1-93d6-bae2fe60a69b/IN-en-20230814-popsignuptwoweeks-perspective_alpha_website_large.jpg"
+          alt="logo"
+        />
       </div>
       <form
         onSubmit={(e) => e.preventDefault()}
-        className="sm:w-full md:w-96 absolute p-12 bg-black my-36 mx-auto right-0 left-0 text-white rounded-lg bg-opacity-80"
+        className="w-96 absolute p-12 bg-black my-36 mx-auto right-0 left-0 text-white rounded-lg bg-opacity-80"
       >
         <h1 className="font-bold text-3xl py-4">
           {isSignInForm ? "Sign In" : "Sign Up"}
@@ -119,5 +133,4 @@ const Login = () => {
     </div>
   );
 };
-
 export default Login;
