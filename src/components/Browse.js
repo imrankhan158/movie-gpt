@@ -3,6 +3,7 @@ import useNowPlayingMovies from "../hooks/useNowPlayingMovies";
 import MainContainer from "./MainContainer";
 import SecondaryContainer from "./SecondaryContainer";
 import usePopularMovies from "../hooks/usePopularMovies";
+import Footer from "./Footer";
 
 const Browse = () => {
   useNowPlayingMovies();
@@ -13,14 +14,7 @@ const Browse = () => {
       <Header />
       <MainContainer />
       <SecondaryContainer />
-      {/* 
-          MainContainer
-            - VideoBackground
-            - VideoTitle
-          SecondaryContainer
-            - MovieList * n
-              - cards * n
-      */}
+      <Footer />
     </div>
   );
 };
