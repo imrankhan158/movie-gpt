@@ -89,7 +89,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contact
 
-If you have any questions or suggestions, please feel free to [contact me](mailto:your.email@example.com).
+If you have any questions or suggestions, please feel free to [contact me](mailto:imran158khan@gmail.com).
 
 ---
 
